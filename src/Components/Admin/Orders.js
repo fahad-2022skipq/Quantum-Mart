@@ -4,6 +4,7 @@ import { HStack,
     Image,
     Text,
     Spinner,
+    useMediaQuery,
 Select} from '@chakra-ui/react'
   import React, { useEffect, useState } from 'react'
   import {useNavigate } from "react-router-dom";
@@ -15,13 +16,26 @@ Select} from '@chakra-ui/react'
   const navigate = useNavigate()
   const url = process.env.REACT_APP_API_URL;
   const [orderDetails,setOrderDetails] = useState([])
-  const [alert, setAlert] = useState(null);
   const {onOpen, onClose} = useAlertContext();
-
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
+  const months = {
+    0: 'January',
+    1: 'February',
+    2: 'March',
+    3: 'April',
+    4: 'May',
+    5: 'June',
+    6: 'July',
+    7: 'August',
+    8: 'September',
+    9: 'October',
+    10: 'November',
+    11: 'December'
+};
 
   const fetchOrder = async () => {
     try {
-    let response = await axios.post(`${url}/getOrder`,
+    let response = await axios.post(`${url}/getAllOrder`,
     null,
     {
       headers: {
@@ -47,7 +61,6 @@ Select} from '@chakra-ui/react'
 
   const handleStatusChange = async (orderId, newStatus) => {
 
-    console.log(`Order ${orderId} and New Status ${newStatus}`)
     try {
       const response = await axios.put(`${url}/updateOrderStatus`, { orderId, status: newStatus });
         console.log(response.data.success)
@@ -63,6 +76,7 @@ Select} from '@chakra-ui/react'
   };
   
   return (
+    
     <VStack minH="100vh"  bgColor="#E7E9EC" spacing={4} paddingTop={20} paddingBottom={6} paddingLeft={5} paddingRight={5}>
          {loading ? (
         <HStack w="100vw" h="92vh" justifyContent="center">
@@ -73,17 +87,30 @@ Select} from '@chakra-ui/react'
           <Text>You haven't place any order </Text>
         </HStack>
       ) :orderDetails && orderDetails.map((order) => (
-        <Box key={order._id} boxShadow="lg" p={6} borderRadius="md" w="75%"  bgColor="#FFFFFF">
+        <Box key={order._id} boxShadow="lg" p={6} borderRadius="md" w={{base:'100%', md:'75%'}}  bgColor="#FFFFFF">
           {/* Order Details */}
           <HStack alignItems="start" justifyContent="space-around">
             <Box> <Text fontSize="lg" fontWeight="bold">
             Order #{order._id}
           </Text>
-               
+     
           <Text>Name: {order.name}</Text>
-          {/* <Text>Email: {order.email}</Text>
-          <Text>Address: {order.address}</Text>
+          <Text>Email: {order.email}</Text>
           <Text>Phone: {order.phone}</Text>
+          <Text>Address: {order.address}</Text>
+          <Text fontWeight='500'> Ordered on: {new Date(order.createdAt).getDate() +" "+months[new Date(order.createdAt).getMonth()]}</Text> 
+          {isMobile && <br/>}
+          {isMobile&&  <Box>
+           {/* Right side code */}
+           <Text fontWeight="bold">Change Status:
+                  <Select w="200px" value={order.status} onChange={(e) => handleStatusChange(order._id, e.target.value)}>
+                    <option value="pending">Pending</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                  </Select>
+           </Text>
+          </Box>}
+          {/* 
           <Text>Payment Method: {order.paymentMethod}</Text>
           <Text>Total Products Price: ${order.itemTotal}</Text>
           <Text>Shipping: ${order.shipping}</Text>
@@ -104,7 +131,7 @@ Select} from '@chakra-ui/react'
           </Box>
           <Text mt={4} fontWeight="bold" color="rgb(213, 77, 77)">Grand Total: Rs.{order.grandTotal}</Text>
           </Box>
-          <Box>
+         {!isMobile&&  <Box>
            {/* Right side code */}
            <Text fontWeight="bold">Change Status:
                   <Select w="200px" value={order.status} onChange={(e) => handleStatusChange(order._id, e.target.value)}>
@@ -113,7 +140,7 @@ Select} from '@chakra-ui/react'
                     <option value="delivered">Delivered</option>
                   </Select>
            </Text>
-          </Box>
+          </Box>}
           </HStack>
          
         </Box>

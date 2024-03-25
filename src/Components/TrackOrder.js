@@ -10,10 +10,12 @@ import {
   StepTitle,
   Stepper,
   useSteps,
-  Box
+  Box,
+  useMediaQuery
 } from '@chakra-ui/react';
 
 function TrackOrder({status}) {
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
   const steps = [
     { title: 'Order Processing', description: 'Processing the order' },
     { title: 'Shipped', description: 'Order has been shipped' },
@@ -27,7 +29,7 @@ function TrackOrder({status}) {
     });
   
     return (
-        <Stepper index={activeStep} orientation='vertical' height='200px' gap='0'>
+        <Stepper index={activeStep} orientation={isMobile?'horizontal':'vertical'} size={{base:'xs',md:'md'}} height={{base:'50px', md:'200px'}} width={{base:'100%'}} gap='0'>
         {steps.map((step, index) => (
           <Step key={index}>
             <StepIndicator>
@@ -38,9 +40,9 @@ function TrackOrder({status}) {
               />
             </StepIndicator>
   
-            <Box flexShrink='0'>
+            <Box flexShrink='0' text>
               <StepTitle>{step.title}</StepTitle>
-              <StepDescription>{step.description}</StepDescription>
+              {!isMobile&&<StepDescription>{step.description}</StepDescription>}
             </Box>
   
             <StepSeparator />

@@ -67,25 +67,28 @@ import { HStack,
 
   
   return (
-    <VStack minH="100vh"  bgColor="#E7E9EC" spacing={4} paddingTop={20} paddingBottom={6} paddingLeft={5} paddingRight={5}>
+    <VStack minH="100vh"  bgColor="#E7E9EC" spacing={4} paddingTop={20} paddingBottom={6} paddingLeft={{base:2,md:5}} paddingRight={{base:2,md:5}}>
          {loading ? (
         <HStack w="100vw" h="92vh" justifyContent="center">
           <Spinner size="xl" />
         </HStack>
       ) : orderDetails.length === 0 ? (
         <HStack w="100vw" h="92vh" justifyContent="center">
-          <Text>You haven't place any order </Text>
+          <Text>Orders information will be displayed here </Text>
         </HStack>
       ) :orderDetails && orderDetails.map((order) => (
-        <Box key={order._id} boxShadow="lg" p={6} borderRadius="md" w="75%"  bgColor="#FFFFFF">
+        <Box key={order._id} boxShadow="lg" p={{base:4,md:6}} borderRadius="md" w={{base:'100%',md:'75%'}}  bgColor="#FFFFFF">
           {/* Order Details */}
           <HStack alignItems="center" justifyContent="space-around">
             <Box> <Text fontSize="lg" fontWeight="bold">
             Order #{order._id}
           </Text>
           <Text>Name: {order.name}</Text>
-          <Text> Ordered on: {new Date(order.createdAt).getDate() +" "+months[new Date(order.createdAt).getMonth()]}</Text> 
-          
+          <Text>Email: {order.email}</Text>
+          <Text>Phone: {order.phone}</Text>
+          <Text>Address: {order.address}</Text>
+          <Text fontWeight='500'> Ordered on: {new Date(order.createdAt).getDate() +" "+months[new Date(order.createdAt).getMonth()]}</Text> 
+          {isMobile&&<TrackOrder status={order.status}/>}
           {/* 
           <Text>Phone: {order.phone}</Text>
           <Text>Email: {order.email}</Text>
@@ -111,10 +114,9 @@ import { HStack,
           <Text  mt={4} fontWeight="bold" color="rgb(213, 77, 77)">Grand Total: Rs.{order.grandTotal}</Text>
           </Box>
           <Box>
-          <TrackOrder status={order.status}/>
+          {!isMobile&&<TrackOrder status={order.status}/>}
           </Box>
           </HStack>
-         
         </Box>
       ))}
     </VStack>

@@ -1,15 +1,16 @@
-import { Box, Flex, Heading, Text, Button, Icon } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text, Button, Icon, useMediaQuery } from '@chakra-ui/react';
 import { FiBox, FiShoppingBag } from 'react-icons/fi'; // Import icons for Products and Orders
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 function Home() {
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
   return (
     <Box minH="100vh" w="100vw" pt={20} bgColor="#E7E9EC" cursor="default" >
     <Flex justify="center" align="center" h="100%">
-      <Box width="45%" p={5} borderWidth={1} borderRadius="lg" bgColor="white" shadow="lg">
+      <Box width={{base:'100%', md:'45%'}} p={5} borderWidth={1} borderRadius="lg" bgColor="white" shadow="lg">
         <Heading as="h3" size="lg" mb={10} textAlign='center'>Admin Panel</Heading>
-        <Flex justify="space-between">
+        <Flex justify="space-between" direction={isMobile?'column':'row'} >
           {/* Products Card */}
           <Link to='/adminaddproduct'>
             <Box p={5} borderWidth={1} borderRadius="lg" bgColor="gray.100" cursor="pointer">
@@ -22,6 +23,7 @@ function Home() {
             </Flex>
           </Box>
           </Link>
+          {isMobile && <br/>}
           {/* Orders Card */}
           <Link to='/adminorders'>
           <Box p={5} borderWidth={1} borderRadius="lg" bgColor="gray.100" cursor="pointer" >

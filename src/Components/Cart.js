@@ -9,6 +9,7 @@ import {
   Button,
   Image,
   Divider,
+  useMediaQuery
 } from "@chakra-ui/react";
 import React from "react";
 import { useEffect, useState } from "react";
@@ -22,6 +23,7 @@ function Cart() {
   const [incrementLoading, setIncrementLoading] = useState({});
   const [decrementLoading, setDecrementLoading] = useState({});
   const [deleteLoading, setDeleteLoading] = useState({});
+  const [isMobile] = useMediaQuery("(max-width: 768px)");
   let total = 0;
   const shipping = 200;
   const url = process.env.REACT_APP_API_URL;
@@ -141,122 +143,112 @@ function Cart() {
           <Text>Currently no item is in the cart</Text>
         </HStack>
       ) : (
-        <Box padding={10}>
-          {/* left side */}
-          <Flex>
-            <Box flex={7} pr={10} pl={10} >
-              <HStack justifyContent="space-between" >
-                <Heading size="lg">Shopping Cart</Heading>
-                <Heading size="md">
-                {cart.products && cart.products.length === 1 ? `${cart.products.length} Item` : `${cart.products.length} Items`}
+        <Box padding={isMobile ? 0 : 10}>
+          <Flex direction={isMobile ? "column" : "row"}>
+            {/* Left Side */}
+            <Box flex={isMobile ? "none" : 7} pr={isMobile ? 0 : 10} pl={isMobile ? 0 : 10}  pb={{base:8,md:0}}>
+              <HStack pr={isMobile ? 4 : 0} pl={isMobile ? 4 : 0} justifyContent="space-between">
+                <Heading  size={{base:"md",md:"lg"}}>Shopping Cart</Heading>
+                <Heading size={{base:"sm",md:"md"}}>
+                  {cart.products && cart.products.length === 1 ? `${cart.products.length} Item` : `${cart.products.length} Items`}
                 </Heading>
               </HStack>
-
-              <Box py="20px">
-              <Divider orientation="horizontal" py="1px" bg="black"/>
+  
+              <Box py={isMobile ? "10px" : "20px"}>
+                <Divider orientation="horizontal" py="1px" bg="black"/>
               </Box>
-              
-              {cart.products &&
-                cart.products.map((item) => (
-                  <Box key={item.id} pt="10px" >
-                    <HStack bg="white" p="10px"  justifyContent="space-evenly">
-                      <HStack spacing="7">
-                        <Image
-                          src={item.image}
-                          boxSize="80px"
-                          objectFit="cover"
-                        />
+  
+              {cart.products && cart.products.map((item) => (
+                <Box key={item.id} pt={isMobile ? "10px" : 0}>
+                  <HStack spacing="4" bg="white" p="10px" justifyContent="space-evenly">
+                    <HStack spacing="3">
+                      <Image
+                        src={item.image}
+                        boxSize={isMobile ? "40px" : "80px"}
+                        objectFit="cover"
+                      />
+                      <Stack direction="column">
+                        <Heading alignItems="left" size={{base:"xs",md:"s"}}>
+                          Name
+                        </Heading>
+                        <Heading fontWeight="normal" size={{base:"15px",md:"s"}} width={isMobile ? "80px" : "200px"}>
+                          {item.name.split(" ").slice(0, 3).join(" ")}
+                        </Heading>
+                      </Stack>
+                    </HStack>
+                    <HStack spacing={isMobile ? "3" : "10"}>
+                      <HStack>
+                        <Button
+                          isLoading={decrementLoading[item.id]}
+                          variant="ghost"
+                          onClick={() => decrementQuantity(cart.id, item.id)}
+                          disabled={item.quantity == 1}
+                          size={{base:"xs",md:"sm"}}
+                        >
+                          <MinusIcon />
+                        </Button>
+                        <Text>{item.quantity}</Text>
+                        <Button
+                          isLoading={incrementLoading[item.id]}
+                          variant="ghost"
+                          onClick={() => incrementQuantity(cart.id, item.id)}
+                          disabled={item.quantity === 10}
+                          size={{base:"xs",md:"sm"}}
+                        >
+                          <AddIcon />
+                        </Button>
+                      </HStack>
+                      <HStack spacing={isMobile ? "3" : "20"}>
                         <Stack direction="column">
-                          <Heading alignItems="left" size="s">
-                            Name
+                          <Heading alignItems="left" size={{base:"xs",md:"s"}}>
+                            Item Price
                           </Heading>
-                          <Heading fontWeight="normal" size="s" width="200px">
-                            {item.name.split(" ").slice(0, 3).join(" ")}
+                          <Heading fontWeight="bold" size={{base:"xs",md:"s"}} color="rgb(213, 77, 77)">
+                            {"Rs." + item.salePrice}
+                          </Heading>
+                        </Stack>
+                        <Stack direction="column">
+                          <Heading alignItems="left" size={{base:"xs",md:"s"}}>
+                            Total Price
+                          </Heading>
+                          <Heading fontWeight="bold" size={{base:"xs",md:"s"}} color="rgb(213, 77, 77)">
+                            {"Rs." + item.salePrice * item.quantity}
                           </Heading>
                         </Stack>
                       </HStack>
-                      <HStack spacing="10">
-                        <HStack>
-                          <Button
-                            isLoading={decrementLoading[item.id]}
-                            variant="ghost"
-                            onClick={() => decrementQuantity(cart.id, item.id)}
-                            disabled={item.quantity == 1}
-                            size="sm"
-                          >
-                            <MinusIcon />
-                          </Button>
-                          <Text>{item.quantity}</Text>
-                          <Button
-                            isLoading={incrementLoading[item.id]}
-                            variant="ghost"
-                            onClick={() => incrementQuantity(cart.id, item.id)}
-                            disabled={item.quantity === 10}
-                            size="sm"
-                          >
-                            <AddIcon />
-                          </Button>
-                        </HStack>
-                        <HStack spacing="20">
-                          <Stack direction="column">
-                            <Heading alignItems="left" size="s">
-                              Item Price
-                            </Heading>
-                            <Heading
-                              fontWeight="bold"
-                              size="s"
-                              color="rgb(213, 77, 77)"
-                            >
-                              {"Rs." + item.salePrice}
-                            </Heading>
-                          </Stack>
-                          <Stack direction="column">
-                            <Heading alignItems="left" size="s">
-                              Total Price
-                            </Heading>
-                            <Heading
-                              fontWeight="bold"
-                              size="s"
-                              color="rgb(213, 77, 77)"
-                            >
-                              {"Rs." + item.salePrice * item.quantity}
-                            </Heading>
-                          </Stack>
-                        </HStack>
-                      </HStack>
-                      <Button
-                        isLoading={deleteLoading[item.id]}
-                        variant="ghost"
-                        onClick={() => deleteItem(cart.id, item.id)}
-                        size="lg"
-                      >
-                        <DeleteIcon />
-                      </Button>
                     </HStack>
-                  </Box>
-                ))}
-
-              <HStack></HStack>
+                    <Button
+                      isLoading={deleteLoading[item.id]}
+                      variant="ghost"
+                      onClick={() => deleteItem(cart.id, item.id)}
+                      size="lg"
+                    >
+                      <DeleteIcon />
+                    </Button>
+                  </HStack>
+                </Box>
+              ))}
             </Box>
-            <Box bg="#f5f5f6" flex={3} p="15px" h="-webkit-fit-content">
-            {cart.products.map((item)=>{
-                   {total+=item.salePrice*item.quantity}
-                })}
-                <Stack direction="column" w="100%" >
-                <Heading fontWeight="normal" size="md" >Item Total: Rs.{total} </Heading>
-                <Heading fontWeight="normal" size="md" >Shipping: Rs.{shipping}</Heading>
+  
+            {/* Right Side */}
+            <Box bg="#f5f5f6" flex={isMobile ? "none" : 3} p={isMobile ? 4 : 15} h={isMobile ? "-webkit-fit-content" : "fit-content"} width={isMobile ? "100%" : "auto"}>
+              {cart.products.map((item) => {
+                {total += item.salePrice * item.quantity}
+              })}
+              <Stack direction="column" w="100%">
+                <Heading fontWeight="normal" size={{base:"sm",md:"md"}}>Item Total: Rs.{total}</Heading>
+                <Heading fontWeight="normal" size={{base:"sm",md:"md"}}>Shipping: Rs.{shipping}</Heading>
                 <Divider py="1px" bg="black"/>
-                <Heading fontWeight="bold" size="md" color="rgb(213, 77, 77)">Grand Total: Rs.{total+shipping}</Heading>
-                
-                <Button onClick={()=>handleCheckOut()} 
-                 colorScheme="orange" width="200px" alignSelf="center" >Checkout <ArrowRightIcon/></Button>
-                </Stack>
+
+               <Heading fontWeight="bold" size={{base:"sm",md:"md"}} color="rgb(213, 77, 77)">Grand Total: Rs.{total + shipping}</Heading>
+                <Button onClick={() => handleCheckOut()} colorScheme="orange" width="200px" alignSelf="center">Checkout <ArrowRightIcon/></Button>
+              </Stack>
             </Box>
           </Flex>
         </Box>
       )}
     </Box>
-  );
+);
 }
 
 export default Cart;
